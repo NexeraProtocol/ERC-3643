@@ -60,10 +60,9 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 interface IModularCompliance {
-
     /// events
 
     /**
@@ -160,11 +159,7 @@ interface IModularCompliance {
      *  @param _amount The amount of tokens involved in the transfer
      *  This function calls moduleTransferAction() on each module bound to the compliance contract
      */
-    function transferred(
-        address _from,
-        address _to,
-        uint256 _amount
-    ) external;
+    function transferred(address _from, address _to, uint256 _amount) external;
 
     /**
      *  @dev function called whenever tokens are created on a wallet
@@ -204,11 +199,7 @@ interface IModularCompliance {
      *  If each of the module checks return TRUE, this function will return TRUE as well
      *  returns FALSE otherwise
      */
-    function canTransfer(
-        address _from,
-        address _to,
-        uint256 _amount
-    ) external view returns (bool);
+    function canTransfer(address _from, address _to, uint256 _amount) external view returns (bool);
 
     /**
      *  @dev getter for the modules bound to the compliance contract

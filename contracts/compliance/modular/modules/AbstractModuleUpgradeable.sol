@@ -60,7 +60,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -74,8 +74,7 @@ abstract contract AbstractModuleUpgradeable is IModule, Initializable, OwnableUp
     }
 
     // keccak256(abi.encode(uint256(keccak256("ERC3643.storage.AbstractModule")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 private constant _ABSTRACT_MODULE_STORAGE_LOCATION =
-        0xf6cc97de1266c180cd39f3b311632644143ce7873d2927755382ad4b39e8ae00;
+    bytes32 private constant _ABSTRACT_MODULE_STORAGE_LOCATION = 0xf6cc97de1266c180cd39f3b311632644143ce7873d2927755382ad4b39e8ae00;
 
     /**
      * @dev Throws if `_compliance` is not a bound compliance contract address.
@@ -110,7 +109,7 @@ abstract contract AbstractModuleUpgradeable is IModule, Initializable, OwnableUp
     /**
      *  @dev See {IModule-unbindCompliance}.
      */
-    function unbindCompliance(address _compliance) external onlyComplianceCall override {
+    function unbindCompliance(address _compliance) external override onlyComplianceCall {
         AbstractModuleStorage storage s = _getAbstractModuleStorage();
         require(_compliance != address(0), "invalid argument - zero address");
         require(msg.sender == _compliance, "only compliance contract can call");
@@ -128,15 +127,15 @@ abstract contract AbstractModuleUpgradeable is IModule, Initializable, OwnableUp
 
     // solhint-disable-next-line func-name-mixedcase
     function __AbstractModule_init() internal onlyInitializing {
-        __Ownable_init();
+        __Ownable_init(msg.sender);
         __AbstractModule_init_unchained();
     }
 
     // solhint-disable-next-line no-empty-blocks, func-name-mixedcase
-    function __AbstractModule_init_unchained() internal onlyInitializing { }
+    function __AbstractModule_init_unchained() internal onlyInitializing {}
 
     // solhint-disable-next-line no-empty-blocks
-    function _authorizeUpgrade(address /*newImplementation*/) internal override virtual onlyOwner { }
+    function _authorizeUpgrade(address /*newImplementation*/) internal virtual override onlyOwner {}
 
     function _getAbstractModuleStorage() private pure returns (AbstractModuleStorage storage s) {
         // solhint-disable-next-line no-inline-assembly

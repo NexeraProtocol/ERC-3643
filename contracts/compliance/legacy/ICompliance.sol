@@ -60,7 +60,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 interface ICompliance {
     /**
@@ -130,11 +130,7 @@ interface ICompliance {
      *  @param _to The address of the receiver
      *  @param _amount The amount of tokens involved in the transfer
      */
-    function transferred(
-        address _from,
-        address _to,
-        uint256 _amount
-    ) external;
+    function transferred(address _from, address _to, uint256 _amount) external;
 
     /**
      *  @dev function called whenever tokens are created
@@ -180,9 +176,5 @@ interface ICompliance {
      *  @param _to The address of the receiver
      *  @param _amount The amount of tokens involved in the transfer
      */
-    function canTransfer(
-        address _from,
-        address _to,
-        uint256 _amount
-    ) external view returns (bool);
+    function canTransfer(address _from, address _to, uint256 _amount) external view returns (bool);
 }

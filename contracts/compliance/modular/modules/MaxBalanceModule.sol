@@ -60,7 +60,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "../IModularCompliance.sol";
@@ -68,7 +68,6 @@ import "../../../token/IToken.sol";
 import "./AbstractModuleUpgradeable.sol";
 
 contract MaxBalanceModule is AbstractModuleUpgradeable {
-
     /// state variables
 
     /// mapping of preset status of compliance addresses
@@ -150,11 +149,8 @@ contract MaxBalanceModule is AbstractModuleUpgradeable {
      *  Only the owner of the Compliance smart contract can call this function
      *  emits _id.length `IDBalancePreSet` events
      */
-    function batchPreSetModuleState(
-        address _compliance,
-        address[] calldata _id,
-        uint256[] calldata _balance) external {
-        if(_id.length == 0 || _id.length != _balance.length) {
+    function batchPreSetModuleState(address _compliance, address[] calldata _id, uint256[] calldata _balance) external {
+        if (_id.length == 0 || _id.length != _balance.length) {
             revert InvalidPresetValues(_compliance, _id, _balance);
         }
 
@@ -223,12 +219,7 @@ contract MaxBalanceModule is AbstractModuleUpgradeable {
      *  returns TRUE if the country of _to is allowed for this _compliance
      *  returns FALSE if the country of _to is not allowed for this _compliance
      */
-    function moduleCheck(
-        address /*_from*/,
-        address _to,
-        uint256 _value,
-        address _compliance
-    ) external view override returns (bool) {
+    function moduleCheck(address /*_from*/, address _to, uint256 _value, address _compliance) external view override returns (bool) {
         if (_value > _maxBalance[_compliance]) {
             return false;
         }
@@ -240,7 +231,7 @@ contract MaxBalanceModule is AbstractModuleUpgradeable {
     }
 
     /**
-    *  @dev getter for compliance identity balance
+     *  @dev getter for compliance identity balance
      *  @param _compliance address of the compliance contract
      *  @param _identity ONCHAINID address
      */
@@ -249,7 +240,7 @@ contract MaxBalanceModule is AbstractModuleUpgradeable {
     }
 
     /**
-      *  @dev See {IModule-canComplianceBind}.
+     *  @dev See {IModule-canComplianceBind}.
      */
     function canComplianceBind(address _compliance) external view returns (bool) {
         if (_compliancePresetStatus[_compliance]) {
@@ -266,7 +257,7 @@ contract MaxBalanceModule is AbstractModuleUpgradeable {
     }
 
     /**
-      *  @dev See {IModule-isPlugAndPlay}.
+     *  @dev See {IModule-isPlugAndPlay}.
      */
     function isPlugAndPlay() external pure returns (bool) {
         return false;
@@ -299,8 +290,7 @@ contract MaxBalanceModule is AbstractModuleUpgradeable {
      *  internal function, used only by the contract itself to process checks on investor countries
      */
     function _getIdentity(address _compliance, address _userAddress) internal view returns (address) {
-        address identity = address(IToken(IModularCompliance(_compliance).getTokenBound())
-            .identityRegistry().identity(_userAddress));
+        address identity = address(IToken(IModularCompliance(_compliance).getTokenBound()).identityRegistry().identity(_userAddress));
         require(identity != address(0), "identity not found");
         return identity;
     }

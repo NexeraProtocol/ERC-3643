@@ -61,7 +61,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 import "../registry/interface/IIdentityRegistry.sol";
 import "../compliance/modular/IModularCompliance.sol";
@@ -69,7 +69,6 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /// @dev interface
 interface IToken is IERC20 {
-
     /// events
 
     /**
@@ -81,8 +80,7 @@ interface IToken is IERC20 {
      *  `_newVersion` is the version of the token, current version is 3.0
      *  `_newOnchainID` is the address of the onchainID of the token
      */
-    event UpdatedTokenInformation(string indexed _newName, string indexed _newSymbol, uint8 _newDecimals, string
-    _newVersion, address indexed _newOnchainID);
+    event UpdatedTokenInformation(string indexed _newName, string indexed _newSymbol, uint8 _newDecimals, string _newVersion, address indexed _newOnchainID);
 
     /**
      *  this event is emitted when the IdentityRegistry has been set for the token
@@ -249,11 +247,7 @@ interface IToken is IERC20 {
      *  emits a `TokensUnfrozen` event if `_amount` is higher than the free balance of `_from`
      *  emits a `Transfer` event
      */
-    function forcedTransfer(
-        address _from,
-        address _to,
-        uint256 _amount
-    ) external returns (bool);
+    function forcedTransfer(address _from, address _to, uint256 _amount) external returns (bool);
 
     /**
      *  @dev mint tokens on a wallet
@@ -293,11 +287,7 @@ interface IToken is IERC20 {
      *  emits a `RecoverySuccess` event if the recovery process is successful
      *  emits a `RecoveryFails` event if the recovery process fails
      */
-    function recoveryAddress(
-        address _lostWallet,
-        address _newWallet,
-        address _investorOnchainID
-    ) external returns (bool);
+    function recoveryAddress(address _lostWallet, address _newWallet, address _investorOnchainID) external returns (bool);
 
     /**
      *  @dev function allowing to issue transfers in batch
@@ -325,11 +315,7 @@ interface IToken is IERC20 {
      *  emits `TokensUnfrozen` events if `_amounts[i]` is higher than the free balance of `_fromList[i]`
      *  emits _fromList.length `Transfer` events
      */
-    function batchForcedTransfer(
-        address[] calldata _fromList,
-        address[] calldata _toList,
-        uint256[] calldata _amounts
-    ) external;
+    function batchForcedTransfer(address[] calldata _fromList, address[] calldata _toList, uint256[] calldata _amounts) external;
 
     /**
      *  @dev function allowing to mint tokens in batch

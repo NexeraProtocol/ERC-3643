@@ -60,7 +60,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 import "../roles/AgentRole.sol";
 import "../token/IToken.sol";
@@ -133,62 +133,41 @@ interface IDVATransferManager {
      *  `approvers` is the list of approvers
      *  `approvalCriteriaHash` is the approval criteria hash
      */
-    event TransferInitiated(
-        bytes32 transferID,
-        address tokenAddress,
-        address sender,
-        address recipient,
-        uint256 amount,
-        bytes32 approvalCriteriaHash
-    );
+    event TransferInitiated(bytes32 transferID, address tokenAddress, address sender, address recipient, uint256 amount, bytes32 approvalCriteriaHash);
 
     /**
-    *  this event is emitted whenever a transfer is approved by an approver
-    *  the event is emitted by 'approveTransfer' function.
-    *  `transferID` is the unique ID of the transfer
-    *  `approver` is the approver address
-    */
-    event TransferApproved(
-        bytes32 transferID,
-        address approver
-    );
+     *  this event is emitted whenever a transfer is approved by an approver
+     *  the event is emitted by 'approveTransfer' function.
+     *  `transferID` is the unique ID of the transfer
+     *  `approver` is the approver address
+     */
+    event TransferApproved(bytes32 transferID, address approver);
 
     /**
-    *  this event is emitted whenever a transfer is rejected by an approver
-    *  the event is emitted by 'rejectTransfer' function.
-    *  `transferID` is the unique ID of the transfer
-    *  `rejectedBy` is the approver address
-    */
-    event TransferRejected(
-        bytes32 transferID,
-        address rejectedBy
-    );
+     *  this event is emitted whenever a transfer is rejected by an approver
+     *  the event is emitted by 'rejectTransfer' function.
+     *  `transferID` is the unique ID of the transfer
+     *  `rejectedBy` is the approver address
+     */
+    event TransferRejected(bytes32 transferID, address rejectedBy);
 
     /**
-    *  this event is emitted whenever a transfer is cancelled by the sender
-    *  the event is emitted by 'cancelTransfer' function.
-    *  `transferID` is the unique ID of the transfer
-    */
-    event TransferCancelled(
-        bytes32 transferID
-    );
+     *  this event is emitted whenever a transfer is cancelled by the sender
+     *  the event is emitted by 'cancelTransfer' function.
+     *  `transferID` is the unique ID of the transfer
+     */
+    event TransferCancelled(bytes32 transferID);
 
     /**
-    *  this event is emitted whenever all approvers approve a transfer
-    *  the event is emitted by 'approveTransfer' function.
-    *  `transferID` is the unique ID of the transfer
-    *  `tokenAddress` is the token address
-    *  `sender` is the address of the sender
-    *  `recipient` is the address of the recipient
-    *  `amount` is the amount of the transfer
-    */
-    event TransferCompleted(
-        bytes32 transferID,
-        address tokenAddress,
-        address sender,
-        address recipient,
-        uint256 amount
-    );
+     *  this event is emitted whenever all approvers approve a transfer
+     *  the event is emitted by 'approveTransfer' function.
+     *  `transferID` is the unique ID of the transfer
+     *  `tokenAddress` is the token address
+     *  `sender` is the address of the sender
+     *  `recipient` is the address of the recipient
+     *  `amount` is the amount of the transfer
+     */
+    event TransferCompleted(bytes32 transferID, address tokenAddress, address sender, address recipient, uint256 amount);
 
     /**
      *  this event is emitted whenever a transfer approval criteria are reset
@@ -197,10 +176,7 @@ interface IDVATransferManager {
      *  `approvers` is the list of approvers
      *  `approvalCriteriaHash` is the approval criteria hash
      */
-    event TransferApprovalStateReset(
-        bytes32 transferID,
-        bytes32 approvalCriteriaHash
-    );
+    event TransferApprovalStateReset(bytes32 transferID, bytes32 approvalCriteriaHash);
 
     error OnlyTokenAgentCanCall(address _tokenAddress);
 
@@ -223,7 +199,7 @@ interface IDVATransferManager {
     error SignaturesCanNotBeEmpty(bytes32 _transferID);
 
     /**
-    *  @dev modify the approval criteria of a token
+     *  @dev modify the approval criteria of a token
      *  @param tokenAddress is the token address.
      *  @param includeRecipientApprover determines whether the recipient is included in the approver list
      *  @param includeAgentApprover determines whether the agent is included in the approver list
@@ -309,7 +285,7 @@ interface IDVATransferManager {
      *  @param transferID is the unique ID of the transfer
      *  returns address of the next approver and any token agent flag
      */
-    function getNextApprover(bytes32 transferID) external view returns (address nextApprover, bool anyTokenAgent) ;
+    function getNextApprover(bytes32 transferID) external view returns (address nextApprover, bool anyTokenAgent);
 
     /**
      *  @dev getter for the next unique nonce value
@@ -331,11 +307,5 @@ interface IDVATransferManager {
      *  @param _amount is the transfer amount
      *  returns a unique transfer ID
      */
-    function calculateTransferID(
-        uint256 _nonce,
-        address _sender,
-        address _recipient,
-        uint256 _amount
-    ) external pure returns (bytes32);
+    function calculateTransferID(uint256 _nonce, address _sender, address _recipient, uint256 _amount) external pure returns (bytes32);
 }
-

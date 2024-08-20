@@ -60,12 +60,11 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 import "./AbstractProxy.sol";
 
 contract TokenProxy is AbstractProxy {
-
     constructor(
         address implementationAuthority,
         address _identityRegistry,
@@ -76,15 +75,11 @@ contract TokenProxy is AbstractProxy {
         // _onchainID can be 0 address if the token has no ONCHAINID, ONCHAINID can be set later by the token Owner
         address _onchainID
     ) {
+        require(implementationAuthority != address(0) && _identityRegistry != address(0) && _compliance != address(0), "invalid argument - zero address");
         require(
-            implementationAuthority != address(0)
-            && _identityRegistry != address(0)
-            && _compliance != address(0)
-        , "invalid argument - zero address");
-        require(
-            keccak256(abi.encode(_name)) != keccak256(abi.encode(""))
-            && keccak256(abi.encode(_symbol)) != keccak256(abi.encode(""))
-        , "invalid argument - empty string");
+            keccak256(abi.encode(_name)) != keccak256(abi.encode("")) && keccak256(abi.encode(_symbol)) != keccak256(abi.encode("")),
+            "invalid argument - empty string"
+        );
         require(0 <= _decimals && _decimals <= 18, "decimals between 0 and 18");
         _storeImplementationAuthority(implementationAuthority);
         emit ImplementationAuthoritySet(implementationAuthority);
@@ -93,16 +88,8 @@ contract TokenProxy is AbstractProxy {
 
         // solhint-disable-next-line avoid-low-level-calls
         (bool success, ) = logic.delegatecall(
-                abi.encodeWithSignature(
-                    "init(address,address,string,string,uint8,address)",
-                    _identityRegistry,
-                    _compliance,
-                    _name,
-                    _symbol,
-                    _decimals,
-                    _onchainID
-                )
-            );
+            abi.encodeWithSignature("init(address,address,string,string,uint8,address)", _identityRegistry, _compliance, _name, _symbol, _decimals, _onchainID)
+        );
         require(success, "Initialization failed.");
     }
 
@@ -117,12 +104,12 @@ contract TokenProxy is AbstractProxy {
             let retSz := returndatasize()
             returndatacopy(0, 0, retSz)
             switch success
-                case 0 {
-                    revert(0, retSz)
-                }
-                default {
-                    return(0, retSz)
-                }
+            case 0 {
+                revert(0, retSz)
+            }
+            default {
+                return(0, retSz)
+            }
         }
     }
 }

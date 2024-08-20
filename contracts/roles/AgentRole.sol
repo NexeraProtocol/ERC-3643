@@ -61,7 +61,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -79,6 +79,8 @@ contract AgentRole is Ownable {
         require(isAgent(msg.sender), "AgentRole: caller does not have the Agent role");
         _;
     }
+
+    constructor() Ownable(msg.sender) {}
 
     function addAgent(address _agent) public onlyOwner {
         require(_agent != address(0), "invalid argument - zero address");

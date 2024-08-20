@@ -60,14 +60,12 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 import "../roles/AgentRole.sol";
 import "../token/IToken.sol";
 
-
 contract DVDTransferManager is Ownable {
-
     /// Types
 
     struct Delivery {
@@ -119,7 +117,8 @@ contract DVDTransferManager is Ownable {
         uint256 token1Amount,
         address taker,
         address indexed token2,
-        uint256 token2Amount);
+        uint256 token2Amount
+    );
 
     /**
      * @dev Emitted when a DVD transfer is validated by `taker` and
@@ -139,20 +138,12 @@ contract DVDTransferManager is Ownable {
      * @dev Emitted when a DVD transfer is cancelled
      * this event is emitted by the `cancelDVDTransfer` function
      */
-    event FeeModified(
-        bytes32 indexed parity,
-        address token1,
-        address token2,
-        uint fee1,
-        uint fee2,
-        uint feeBase,
-        address fee1Wallet,
-        address fee2Wallet);
+    event FeeModified(bytes32 indexed parity, address token1, address token2, uint fee1, uint fee2, uint feeBase, address fee1Wallet, address fee2Wallet);
 
     /// functions
 
     // initiates the nonce at 0
-    constructor(){
+    constructor() Ownable(msg.sender) {
         txNonce = 0;
     }
 
@@ -175,29 +166,10 @@ contract DVDTransferManager is Ownable {
      *  note that if fees are not set for a parity the default fee is basically 0%
      *  emits a `FeeModified` event
      */
-    function modifyFee(
-        address _token1,
-        address _token2,
-        uint _fee1,
-        uint _fee2,
-        uint _feeBase,
-        address _fee1Wallet,
-        address _fee2Wallet) external {
-        require(
-            msg.sender == owner() ||
-            isTREXOwner(_token1, msg.sender) ||
-            isTREXOwner(_token2, msg.sender)
-            , "Ownable: only owner can call");
-        require(
-            IERC20(_token1).totalSupply() != 0 &&
-            IERC20(_token2).totalSupply() != 0
-            , "invalid address : address is not an ERC20");
-        require(
-            _fee1 <= 10**_feeBase && _fee1 >= 0 &&
-            _fee2 <= 10**_feeBase && _fee2 >= 0 &&
-            _feeBase <= 5 &&
-            _feeBase >= 2
-            , "invalid fee settings");
+    function modifyFee(address _token1, address _token2, uint _fee1, uint _fee2, uint _feeBase, address _fee1Wallet, address _fee2Wallet) external {
+        require(msg.sender == owner() || isTREXOwner(_token1, msg.sender) || isTREXOwner(_token2, msg.sender), "Ownable: only owner can call");
+        require(IERC20(_token1).totalSupply() != 0 && IERC20(_token2).totalSupply() != 0, "invalid address : address is not an ERC20");
+        require(_fee1 <= 10 ** _feeBase && _fee1 >= 0 && _fee2 <= 10 ** _feeBase && _fee2 >= 0 && _feeBase <= 5 && _feeBase >= 2, "invalid fee settings");
         if (_fee1 > 0) {
             require(_fee1Wallet != address(0), "fee wallet 1 cannot be zero address");
         }
@@ -238,17 +210,10 @@ contract DVDTransferManager is Ownable {
      *  requires `_token1` & `_token2` to be valid token addresses
      *  emits a `DVDTransferInitiated` event
      */
-    function initiateDVDTransfer(
-        address _token1,
-        uint256 _token1Amount,
-        address _counterpart,
-        address _token2,
-        uint256 _token2Amount) external {
+    function initiateDVDTransfer(address _token1, uint256 _token1Amount, address _counterpart, address _token2, uint256 _token2Amount) external {
         require(IERC20(_token1).balanceOf(msg.sender) >= _token1Amount, "Not enough tokens in balance");
-        require(
-            IERC20(_token1).allowance(msg.sender, address(this)) >= _token1Amount
-            , "not enough allowance to initiate transfer");
-        require (_counterpart != address(0), "counterpart cannot be null");
+        require(IERC20(_token1).allowance(msg.sender, address(this)) >= _token1Amount, "not enough allowance to initiate transfer");
+        require(_counterpart != address(0), "counterpart cannot be null");
         require(IERC20(_token2).totalSupply() != 0, "invalid address : address is not an ERC20");
         Delivery memory token1;
         token1.counterpart = msg.sender;
@@ -258,25 +223,10 @@ contract DVDTransferManager is Ownable {
         token2.counterpart = _counterpart;
         token2.token = _token2;
         token2.amount = _token2Amount;
-        bytes32 transferID =
-        calculateTransferID(
-                txNonce,
-                token1.counterpart,
-                token1.token,
-                token1.amount,
-                token2.counterpart,
-                token2.token,
-                token2.amount);
+        bytes32 transferID = calculateTransferID(txNonce, token1.counterpart, token1.token, token1.amount, token2.counterpart, token2.token, token2.amount);
         token1ToDeliver[transferID] = token1;
         token2ToDeliver[transferID] = token2;
-        emit DVDTransferInitiated(
-                transferID,
-                token1.counterpart,
-                token1.token,
-                token1.amount,
-                token2.counterpart,
-                token2.token,
-                token2.amount);
+        emit DVDTransferInitiated(transferID, token1.counterpart, token1.token, token1.amount, token2.counterpart, token2.token, token2.amount);
         txNonce++;
     }
 
@@ -306,22 +256,15 @@ contract DVDTransferManager is Ownable {
     function takeDVDTransfer(bytes32 _transferID) external {
         Delivery memory token1 = token1ToDeliver[_transferID];
         Delivery memory token2 = token2ToDeliver[_transferID];
-        require(
-            token1.counterpart != address(0) && token2.counterpart != address(0)
-            , "transfer ID does not exist");
+        require(token1.counterpart != address(0) && token2.counterpart != address(0), "transfer ID does not exist");
         IERC20 token1Contract = IERC20(token1.token);
         IERC20 token2Contract = IERC20(token2.token);
-        require (
-            msg.sender == token2.counterpart ||
-            isTREXAgent(token1.token, msg.sender) ||
-            isTREXAgent(token2.token, msg.sender)
-            , "transfer has to be done by the counterpart or by owner");
         require(
-            token2Contract.balanceOf(token2.counterpart) >= token2.amount
-            , "Not enough tokens in balance");
-        require(
-            token2Contract.allowance(token2.counterpart, address(this)) >= token2.amount
-            , "not enough allowance to transfer");
+            msg.sender == token2.counterpart || isTREXAgent(token1.token, msg.sender) || isTREXAgent(token2.token, msg.sender),
+            "transfer has to be done by the counterpart or by owner"
+        );
+        require(token2Contract.balanceOf(token2.counterpart) >= token2.amount, "Not enough tokens in balance");
+        require(token2Contract.allowance(token2.counterpart, address(this)) >= token2.amount, "not enough allowance to transfer");
         TxFees memory fees = calculateFee(_transferID);
         if (fees.txFee1 != 0) {
             token1Contract.transferFrom(token1.counterpart, token2.counterpart, (token1.amount - fees.txFee1));
@@ -357,13 +300,14 @@ contract DVDTransferManager is Ownable {
         Delivery memory token1 = token1ToDeliver[_transferID];
         Delivery memory token2 = token2ToDeliver[_transferID];
         require(token1.counterpart != address(0) && token2.counterpart != address(0), "transfer ID does not exist");
-        require (
+        require(
             msg.sender == token2.counterpart ||
-            msg.sender == token1.counterpart ||
-            msg.sender == owner() ||
-            isTREXAgent(token1.token, msg.sender) ||
-            isTREXAgent(token2.token, msg.sender)
-            , "you are not allowed to cancel this transfer");
+                msg.sender == token1.counterpart ||
+                msg.sender == owner() ||
+                isTREXAgent(token1.token, msg.sender) ||
+                isTREXAgent(token2.token, msg.sender),
+            "you are not allowed to cancel this transfer"
+        );
         delete token1ToDeliver[_transferID];
         delete token2ToDeliver[_transferID];
         emit DVDTransferCancelled(_transferID);
@@ -383,9 +327,8 @@ contract DVDTransferManager is Ownable {
             if (address(_ir) != address(0)) {
                 return true;
             }
-        return false;
-        }
-        catch {
+            return false;
+        } catch {
             return false;
         }
     }
@@ -398,7 +341,7 @@ contract DVDTransferManager is Ownable {
      *  return `true` if `_user` is agent of `_token`, return `false` otherwise
      */
     function isTREXAgent(address _token, address _user) public view returns (bool) {
-        if (isTREX(_token)){
+        if (isTREX(_token)) {
             return AgentRole(_token).isAgent(_user);
         }
         return false;
@@ -412,7 +355,7 @@ contract DVDTransferManager is Ownable {
      *  return `true` if `_user` is owner of `_token`, return `false` otherwise
      */
     function isTREXOwner(address _token, address _user) public view returns (bool) {
-        if (isTREX(_token)){
+        if (isTREX(_token)) {
             return Ownable(_token).owner() == _user;
         }
         return false;
@@ -426,27 +369,22 @@ contract DVDTransferManager is Ownable {
      *  requires `_transferID` to exist (DVD transfer has to be initiated)
      *  returns the fees to apply on each leg of the transfer in the form of a `TxFees` struct
      */
-    function calculateFee(bytes32 _transferID) public view returns(TxFees memory) {
+    function calculateFee(bytes32 _transferID) public view returns (TxFees memory) {
         TxFees memory fees;
         Delivery memory token1 = token1ToDeliver[_transferID];
         Delivery memory token2 = token2ToDeliver[_transferID];
-        require(
-            token1.counterpart != address(0) && token2.counterpart != address(0)
-        , "transfer ID does not exist");
+        require(token1.counterpart != address(0) && token2.counterpart != address(0), "transfer ID does not exist");
         bytes32 parity = calculateParity(token1.token, token2.token);
         Fee memory feeDetails = fee[parity];
-        if (feeDetails.token1Fee != 0 || feeDetails.token2Fee != 0 ){
-            uint _txFee1 =
-            (token1.amount * feeDetails.token1Fee * 10**(feeDetails.feeBase - 2)) / (10**feeDetails.feeBase);
-            uint _txFee2 =
-            (token2.amount * feeDetails.token2Fee * 10**(feeDetails.feeBase - 2)) / (10**feeDetails.feeBase);
+        if (feeDetails.token1Fee != 0 || feeDetails.token2Fee != 0) {
+            uint _txFee1 = (token1.amount * feeDetails.token1Fee * 10 ** (feeDetails.feeBase - 2)) / (10 ** feeDetails.feeBase);
+            uint _txFee2 = (token2.amount * feeDetails.token2Fee * 10 ** (feeDetails.feeBase - 2)) / (10 ** feeDetails.feeBase);
             fees.txFee1 = _txFee1;
             fees.txFee2 = _txFee2;
             fees.fee1Wallet = feeDetails.fee1Wallet;
             fees.fee2Wallet = feeDetails.fee2Wallet;
             return fees;
-        }
-        else {
+        } else {
             fees.txFee1 = 0;
             fees.txFee2 = 0;
             fees.fee1Wallet = address(0);
@@ -461,7 +399,7 @@ contract DVDTransferManager is Ownable {
      *  @param _token2 the address of the counterpart token
      *  return the byte signature of the parity
      */
-    function calculateParity (address _token1, address _token2) public pure returns (bytes32) {
+    function calculateParity(address _token1, address _token2) public pure returns (bytes32) {
         bytes32 parity = keccak256(abi.encode(_token1, _token2));
         return parity;
     }
@@ -477,7 +415,7 @@ contract DVDTransferManager is Ownable {
      *  @param _token2Amount the amount of tokens `_token2` provided by the taker
      *  return the identifier of the DVD transfer as a byte signature
      */
-    function calculateTransferID (
+    function calculateTransferID(
         uint256 _nonce,
         address _maker,
         address _token1,
@@ -485,10 +423,8 @@ contract DVDTransferManager is Ownable {
         address _taker,
         address _token2,
         uint256 _token2Amount
-    ) public pure returns (bytes32){
-        bytes32 transferID = keccak256(abi.encode(
-                _nonce, _maker, _token1, _token1Amount, _taker, _token2, _token2Amount
-            ));
+    ) public pure returns (bytes32) {
+        bytes32 transferID = keccak256(abi.encode(_nonce, _maker, _token1, _token1Amount, _taker, _token2, _token2Amount));
         return transferID;
     }
 }

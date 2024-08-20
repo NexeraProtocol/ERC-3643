@@ -60,7 +60,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 import "../IModularCompliance.sol";
 import "../../../token/IToken.sol";
@@ -94,12 +94,12 @@ contract TimeTransfersLimitsModule is AbstractModuleUpgradeable {
     mapping(address => mapping(address => mapping(uint32 => TransferCounter))) public usersCounters;
 
     /**
-    *  this event is emitted whenever a transfer limit is updated for the given compliance address and limit time
-    *  the event is emitted by 'setTimeTransferLimit'.
-    *  compliance`is the compliance contract address
-    *  _limitValue is the new limit value for the given limit time
-    *  _limitTime is the period of time of the limit
-    */
+     *  this event is emitted whenever a transfer limit is updated for the given compliance address and limit time
+     *  the event is emitted by 'setTimeTransferLimit'.
+     *  compliance`is the compliance contract address
+     *  _limitValue is the new limit value for the given limit time
+     *  _limitTime is the period of time of the limit
+     */
     event TimeTransferLimitUpdated(address indexed compliance, uint32 limitTime, uint256 limitValue);
 
     error LimitsArraySizeExceeded(address compliance, uint arraySize);
@@ -113,10 +113,10 @@ contract TimeTransfersLimitsModule is AbstractModuleUpgradeable {
     }
 
     /**
-    *  @dev Sets the limit of tokens allowed to be transferred in the given time frame.
-    *  @param _limit The limit time and value
-    *  Only the owner of the Compliance smart contract can call this function
-    */
+     *  @dev Sets the limit of tokens allowed to be transferred in the given time frame.
+     *  @param _limit The limit time and value
+     *  Only the owner of the Compliance smart contract can call this function
+     */
     function setTimeTransferLimit(Limit calldata _limit) external onlyComplianceCall {
         bool limitIsAttributed = limitValues[msg.sender][_limit.limitTime].attributedLimit;
         uint8 limitCount = uint8(transferLimits[msg.sender].length);
@@ -155,12 +155,7 @@ contract TimeTransfersLimitsModule is AbstractModuleUpgradeable {
     /**
      *  @dev See {IModule-moduleCheck}.
      */
-    function moduleCheck(
-        address _from,
-        address /*_to*/,
-        uint256 _value,
-        address _compliance
-    ) external view override returns (bool) {
+    function moduleCheck(address _from, address /*_to*/, uint256 _value, address _compliance) external view override returns (bool) {
         if (_from == address(0)) {
             return true;
         }
@@ -175,9 +170,10 @@ contract TimeTransfersLimitsModule is AbstractModuleUpgradeable {
                 return false;
             }
 
-            if (!_isUserCounterFinished(_compliance, senderIdentity, transferLimits[_compliance][i].limitTime)
-                && usersCounters[_compliance][senderIdentity][transferLimits[_compliance][i].limitTime].value + _value
-                    > transferLimits[_compliance][i].limitValue) {
+            if (
+                !_isUserCounterFinished(_compliance, senderIdentity, transferLimits[_compliance][i].limitTime) &&
+                usersCounters[_compliance][senderIdentity][transferLimits[_compliance][i].limitTime].value + _value > transferLimits[_compliance][i].limitValue
+            ) {
                 return false;
             }
         }
@@ -186,10 +182,10 @@ contract TimeTransfersLimitsModule is AbstractModuleUpgradeable {
     }
 
     /**
-    *  @dev getter for `transferLimits` variable
-    *  @param _compliance the Compliance smart contract to be checked
-    *  returns array of Limits
-    */
+     *  @dev getter for `transferLimits` variable
+     *  @param _compliance the Compliance smart contract to be checked
+     *  returns array of Limits
+     */
     function getTimeTransferLimits(address _compliance) external view returns (Limit[] memory limits) {
         return transferLimits[_compliance];
     }
@@ -216,12 +212,12 @@ contract TimeTransfersLimitsModule is AbstractModuleUpgradeable {
     }
 
     /**
-    *  @dev Checks if the cooldown must be reset, then increases user's OnchainID counters,
-    *  @param _compliance the Compliance smart contract address
-    *  @param _userAddress user wallet address
-    *  @param _value, value of transaction)to be increased
-    *  internal function, can be called only from the functions of the Compliance smart contract
-    */
+     *  @dev Checks if the cooldown must be reset, then increases user's OnchainID counters,
+     *  @param _compliance the Compliance smart contract address
+     *  @param _userAddress user wallet address
+     *  @param _value, value of transaction)to be increased
+     *  internal function, can be called only from the functions of the Compliance smart contract
+     */
     function _increaseCounters(address _compliance, address _userAddress, uint256 _value) internal {
         address identity = _getIdentity(_compliance, _userAddress);
         for (uint256 i = 0; i < transferLimits[_compliance].length; i++) {
@@ -231,12 +227,12 @@ contract TimeTransfersLimitsModule is AbstractModuleUpgradeable {
     }
 
     /**
-    *  @dev resets cooldown for the user if cooldown has reached the time limit
-    *  @param _compliance the Compliance smart contract address
-    *  @param _identity ONCHAINID of user wallet
-    *  @param _limitTime limit time frame
-    *  internal function, can be called only from the functions of the Compliance smart contract
-    */
+     *  @dev resets cooldown for the user if cooldown has reached the time limit
+     *  @param _compliance the Compliance smart contract address
+     *  @param _identity ONCHAINID of user wallet
+     *  @param _limitTime limit time frame
+     *  internal function, can be called only from the functions of the Compliance smart contract
+     */
     function _resetUserCounter(address _compliance, address _identity, uint32 _limitTime) internal {
         if (_isUserCounterFinished(_compliance, _identity, _limitTime)) {
             TransferCounter storage counter = usersCounters[_compliance][_identity][_limitTime];
@@ -246,32 +242,31 @@ contract TimeTransfersLimitsModule is AbstractModuleUpgradeable {
     }
 
     /**
-    *  @dev checks if the counter time frame has finished since the cooldown has been triggered for this identity
-    *  @param _compliance the Compliance smart contract to be checked
-    *  @param _identity ONCHAINID of user wallet
-    *  @param _limitTime limit time frame
-    *  internal function, can be called only from the functions of the Compliance smart contract
-    */
+     *  @dev checks if the counter time frame has finished since the cooldown has been triggered for this identity
+     *  @param _compliance the Compliance smart contract to be checked
+     *  @param _identity ONCHAINID of user wallet
+     *  @param _limitTime limit time frame
+     *  internal function, can be called only from the functions of the Compliance smart contract
+     */
     function _isUserCounterFinished(address _compliance, address _identity, uint32 _limitTime) internal view returns (bool) {
         return usersCounters[_compliance][_identity][_limitTime].timer <= block.timestamp;
     }
 
     /**
-    *  @dev Returns the ONCHAINID (Identity) of the _userAddress
-    *  @param _userAddress Address of the wallet
-    *  internal function, can be called only from the functions of the Compliance smart contract
-    */
+     *  @dev Returns the ONCHAINID (Identity) of the _userAddress
+     *  @param _userAddress Address of the wallet
+     *  internal function, can be called only from the functions of the Compliance smart contract
+     */
     function _getIdentity(address _compliance, address _userAddress) internal view returns (address) {
-        return address(IToken(IModularCompliance(_compliance).getTokenBound()).identityRegistry().identity
-            (_userAddress));
+        return address(IToken(IModularCompliance(_compliance).getTokenBound()).identityRegistry().identity(_userAddress));
     }
 
     /**
-    *  @dev checks if the given user address is an agent of token
-    *  @param compliance the Compliance smart contract to be checked
-    *  @param _userAddress ONCHAIN identity of the user
-    *  internal function, can be called only from the functions of the Compliance smart contract
-    */
+     *  @dev checks if the given user address is an agent of token
+     *  @param compliance the Compliance smart contract to be checked
+     *  @param _userAddress ONCHAIN identity of the user
+     *  internal function, can be called only from the functions of the Compliance smart contract
+     */
     function _isTokenAgent(address compliance, address _userAddress) internal view returns (bool) {
         return AgentRole(IModularCompliance(compliance).getTokenBound()).isAgent(_userAddress);
     }

@@ -60,14 +60,13 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 import "./interface/IProxy.sol";
 import "./authority/ITREXImplementationAuthority.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 abstract contract AbstractProxy is IProxy, Initializable {
-
     /**
      *  @dev See {IProxy-setImplementationAuthority}.
      */
@@ -75,13 +74,14 @@ abstract contract AbstractProxy is IProxy, Initializable {
         require(msg.sender == getImplementationAuthority(), "only current implementationAuthority can call");
         require(_newImplementationAuthority != address(0), "invalid argument - zero address");
         require(
-            (ITREXImplementationAuthority(_newImplementationAuthority)).getTokenImplementation() != address(0)
-            && (ITREXImplementationAuthority(_newImplementationAuthority)).getCTRImplementation() != address(0)
-            && (ITREXImplementationAuthority(_newImplementationAuthority)).getIRImplementation() != address(0)
-            && (ITREXImplementationAuthority(_newImplementationAuthority)).getIRSImplementation() != address(0)
-            && (ITREXImplementationAuthority(_newImplementationAuthority)).getMCImplementation() != address(0)
-            && (ITREXImplementationAuthority(_newImplementationAuthority)).getTIRImplementation() != address(0)
-        , "invalid Implementation Authority");
+            (ITREXImplementationAuthority(_newImplementationAuthority)).getTokenImplementation() != address(0) &&
+                (ITREXImplementationAuthority(_newImplementationAuthority)).getCTRImplementation() != address(0) &&
+                (ITREXImplementationAuthority(_newImplementationAuthority)).getIRImplementation() != address(0) &&
+                (ITREXImplementationAuthority(_newImplementationAuthority)).getIRSImplementation() != address(0) &&
+                (ITREXImplementationAuthority(_newImplementationAuthority)).getMCImplementation() != address(0) &&
+                (ITREXImplementationAuthority(_newImplementationAuthority)).getTIRImplementation() != address(0),
+            "invalid Implementation Authority"
+        );
         _storeImplementationAuthority(_newImplementationAuthority);
         emit ImplementationAuthoritySet(_newImplementationAuthority);
     }
@@ -89,7 +89,7 @@ abstract contract AbstractProxy is IProxy, Initializable {
     /**
      *  @dev See {IProxy-getImplementationAuthority}.
      */
-    function getImplementationAuthority() public override view returns(address) {
+    function getImplementationAuthority() public view override returns (address) {
         address implemAuth;
         // solhint-disable-next-line no-inline-assembly
         assembly {
@@ -108,5 +108,4 @@ abstract contract AbstractProxy is IProxy, Initializable {
             sstore(0x821f3e4d3d679f19eacc940c87acf846ea6eae24a63058ea750304437a62aafc, implementationAuthority)
         }
     }
-
 }

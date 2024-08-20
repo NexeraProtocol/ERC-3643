@@ -58,14 +58,13 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract TestERC20 is Ownable, ERC20Pausable {
-
-    constructor(string memory name, string memory symbol) ERC20(name, symbol) {}
+    constructor(string memory name, string memory symbol) ERC20(name, symbol) Ownable(msg.sender) {}
 
     function pause() public onlyOwner {
         _pause();
@@ -78,5 +77,4 @@ contract TestERC20 is Ownable, ERC20Pausable {
     function unpause() public onlyOwner {
         _unpause();
     }
-
 }

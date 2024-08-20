@@ -61,18 +61,16 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
-import "@onchain-id/solidity/contracts/interface/IClaimIssuer.sol";
+import "contracts/utils/onchain-id/solidity/contracts/interface/IClaimIssuer.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "../interface/ITrustedIssuersRegistry.sol";
 import "../storage/TIRStorage.sol";
 
-
 contract TrustedIssuersRegistry is ITrustedIssuersRegistry, OwnableUpgradeable, TIRStorage {
-
     function init() external initializer {
-        __Ownable_init();
+        __Ownable_init(msg.sender);
     }
 
     /**
@@ -106,16 +104,12 @@ contract TrustedIssuersRegistry is ITrustedIssuersRegistry, OwnableUpgradeable, 
                 break;
             }
         }
-        for (
-            uint256 claimTopicIndex = 0;
-            claimTopicIndex < _trustedIssuerClaimTopics[address(_trustedIssuer)].length;
-            claimTopicIndex++) {
+        for (uint256 claimTopicIndex = 0; claimTopicIndex < _trustedIssuerClaimTopics[address(_trustedIssuer)].length; claimTopicIndex++) {
             uint256 claimTopic = _trustedIssuerClaimTopics[address(_trustedIssuer)][claimTopicIndex];
             uint256 topicsLength = _claimTopicsToTrustedIssuers[claimTopic].length;
             for (uint256 i = 0; i < topicsLength; i++) {
                 if (_claimTopicsToTrustedIssuers[claimTopic][i] == _trustedIssuer) {
-                    _claimTopicsToTrustedIssuers[claimTopic][i] =
-                    _claimTopicsToTrustedIssuers[claimTopic][topicsLength - 1];
+                    _claimTopicsToTrustedIssuers[claimTopic][i] = _claimTopicsToTrustedIssuers[claimTopic][topicsLength - 1];
                     _claimTopicsToTrustedIssuers[claimTopic].pop();
                     break;
                 }
@@ -139,8 +133,7 @@ contract TrustedIssuersRegistry is ITrustedIssuersRegistry, OwnableUpgradeable, 
             uint256 topicsLength = _claimTopicsToTrustedIssuers[claimTopic].length;
             for (uint256 j = 0; j < topicsLength; j++) {
                 if (_claimTopicsToTrustedIssuers[claimTopic][j] == _trustedIssuer) {
-                    _claimTopicsToTrustedIssuers[claimTopic][j] =
-                    _claimTopicsToTrustedIssuers[claimTopic][topicsLength - 1];
+                    _claimTopicsToTrustedIssuers[claimTopic][j] = _claimTopicsToTrustedIssuers[claimTopic][topicsLength - 1];
                     _claimTopicsToTrustedIssuers[claimTopic].pop();
                     break;
                 }
@@ -171,7 +164,7 @@ contract TrustedIssuersRegistry is ITrustedIssuersRegistry, OwnableUpgradeable, 
      *  @dev See {ITrustedIssuersRegistry-isTrustedIssuer}.
      */
     function isTrustedIssuer(address _issuer) external view override returns (bool) {
-        if(_trustedIssuerClaimTopics[_issuer].length > 0) {
+        if (_trustedIssuerClaimTopics[_issuer].length > 0) {
             return true;
         }
         return false;
@@ -181,7 +174,7 @@ contract TrustedIssuersRegistry is ITrustedIssuersRegistry, OwnableUpgradeable, 
      *  @dev See {ITrustedIssuersRegistry-getTrustedIssuerClaimTopics}.
      */
     function getTrustedIssuerClaimTopics(IClaimIssuer _trustedIssuer) external view override returns (uint256[] memory) {
-        require(_trustedIssuerClaimTopics[address(_trustedIssuer)].length != 0, "trusted Issuer doesn\'t exist");
+        require(_trustedIssuerClaimTopics[address(_trustedIssuer)].length != 0, "trusted Issuer doesn't exist");
         return _trustedIssuerClaimTopics[address(_trustedIssuer)];
     }
 

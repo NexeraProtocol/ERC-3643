@@ -60,10 +60,9 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 interface IProxy {
-
     /// events
 
     event ImplementationAuthoritySet(address indexed _implementationAuthority);
@@ -72,5 +71,5 @@ interface IProxy {
 
     function setImplementationAuthority(address _newImplementationAuthority) external;
 
-    function getImplementationAuthority() external view returns(address);
+    function getImplementationAuthority() external view returns (address);
 }

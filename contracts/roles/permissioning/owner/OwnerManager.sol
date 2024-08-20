@@ -61,7 +61,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 import "../../../token/IToken.sol";
 import "../../../registry/interface/IIdentityRegistry.sol";
@@ -70,8 +70,8 @@ import "../../../registry/interface/IClaimTopicsRegistry.sol";
 import "../../../compliance/legacy/ICompliance.sol";
 import "./OwnerRoles.sol";
 import "../../AgentRole.sol";
-import "@onchain-id/solidity/contracts/interface/IIdentity.sol";
-import "@onchain-id/solidity/contracts/interface/IClaimIssuer.sol";
+import "contracts/utils/onchain-id/solidity/contracts/interface/IIdentity.sol";
+import "contracts/utils/onchain-id/solidity/contracts/interface/IClaimIssuer.sol";
 
 contract OwnerManager is OwnerRoles {
     /// @dev the token that is managed by this OwnerManager Contract
@@ -135,7 +135,8 @@ contract OwnerManager is OwnerRoles {
     function callComplianceFunction(bytes calldata callData, IIdentity _onchainID) external {
         require(
             isComplianceManager(address(_onchainID)) && _onchainID.keyHasPurpose(keccak256(abi.encode(msg.sender)), 2),
-            "Role: Sender is NOT Compliance Manager");
+            "Role: Sender is NOT Compliance Manager"
+        );
         address target = address(token.compliance());
 
         // NOTE: Use assembly to call the interaction instead of a low level
@@ -148,25 +149,14 @@ contract OwnerManager is OwnerRoles {
         assembly {
             let freeMemoryPointer := mload(0x40)
             calldatacopy(freeMemoryPointer, callData.offset, callData.length)
-            if iszero(
-                call(
-                    gas(),
-                    target,
-                    0,
-                    freeMemoryPointer,
-                    callData.length,
-                    0,
-                    0
-                    ))
-                {
-                    returndatacopy(0, 0, returndatasize())
-                    revert(0, returndatasize())
-                }
+            if iszero(call(gas(), target, 0, freeMemoryPointer, callData.length, 0, 0)) {
+                returndatacopy(0, 0, returndatasize())
+                revert(0, returndatasize())
             }
+        }
 
         emit ComplianceInteraction(target, _selector(callData));
-
-        }
+    }
 
     /**
      *  @dev calls the `setName` function on the token contract
@@ -256,11 +246,7 @@ contract OwnerManager is OwnerRoles {
      *  Requires that msg.sender is an ACTION KEY on `_onchainID`
      *  @param _onchainID the _onchainID contract of the caller, e.g. "i call this function and i am Bob"
      */
-    function callAddTrustedIssuer(
-        IClaimIssuer _trustedIssuer,
-        uint256[] calldata _claimTopics,
-        IIdentity _onchainID
-    ) external {
+    function callAddTrustedIssuer(IClaimIssuer _trustedIssuer, uint256[] calldata _claimTopics, IIdentity _onchainID) external {
         require(
             isIssuersRegistryManager(address(_onchainID)) && _onchainID.keyHasPurpose(keccak256(abi.encode(msg.sender)), 2),
             "Role: Sender is NOT IssuersRegistryManager"
@@ -292,11 +278,7 @@ contract OwnerManager is OwnerRoles {
      *  Requires that msg.sender is an ACTION KEY on `_onchainID`
      *  @param _onchainID the _onchainID contract of the caller, e.g. "i call this function and i am Bob"
      */
-    function callUpdateIssuerClaimTopics(
-        IClaimIssuer _trustedIssuer,
-        uint256[] calldata _claimTopics,
-        IIdentity _onchainID
-    ) external {
+    function callUpdateIssuerClaimTopics(IClaimIssuer _trustedIssuer, uint256[] calldata _claimTopics, IIdentity _onchainID) external {
         require(
             isIssuersRegistryManager(address(_onchainID)) && _onchainID.keyHasPurpose(keccak256(abi.encode(msg.sender)), 2),
             "Role: Sender is NOT IssuersRegistryManager"

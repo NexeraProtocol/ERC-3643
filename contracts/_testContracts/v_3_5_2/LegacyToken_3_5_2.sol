@@ -1,17 +1,16 @@
 /**
  *Submitted for verification at polygonscan.com on 2022-11-10
-*/
+ */
 
-// File: @onchain-id/solidity/contracts/interface/IERC734Legacy.sol
+// File: onchain-id/solidity/contracts/interface/IERC734Legacy.sol
 
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 /**
  * @dev interface of the ERC734 (Key Holder) standard as defined in the EIP.
  */
 interface IERC734Legacy {
-
     /**
      * @dev Emitted when an execution request was approved.
      *
@@ -56,7 +55,6 @@ interface IERC734Legacy {
      */
     event KeysRequiredChanged(uint256 purpose, uint256 number);
 
-
     /**
      * @dev Adds a _key to the identity. The _purpose specifies the purpose of the key.
      *
@@ -67,14 +65,14 @@ interface IERC734Legacy {
     function addKey(bytes32 _key, uint256 _purpose, uint256 _keyType) external returns (bool success);
 
     /**
-    * @dev Approves an execution or claim addition.
-    *
-    * Triggers Event: `Approved`, `Executed`
-    *
-    * Specification:
-    * This SHOULD require n of m approvals of keys purpose 1, if the _to of the execution is the identity contract itself, to successfully approve an execution.
-    * And COULD require n of m approvals of keys purpose 2, if the _to of the execution is another contract, to successfully approve an execution.
-    */
+     * @dev Approves an execution or claim addition.
+     *
+     * Triggers Event: `Approved`, `Executed`
+     *
+     * Specification:
+     * This SHOULD require n of m approvals of keys purpose 1, if the _to of the execution is the identity contract itself, to successfully approve an execution.
+     * And COULD require n of m approvals of keys purpose 2, if the _to of the execution is another contract, to successfully approve an execution.
+     */
     function approve(uint256 _id, bool _approve) external returns (bool success);
 
     /**
@@ -96,7 +94,7 @@ interface IERC734Legacy {
     /**
      * @dev Returns the list of purposes associated with a key.
      */
-    function getKeyPurposes(bytes32 _key) external view returns(uint256[] memory _purposes);
+    function getKeyPurposes(bytes32 _key) external view returns (uint256[] memory _purposes);
 
     /**
      * @dev Returns an array of public key bytes32 held by this identity.
@@ -118,19 +116,26 @@ interface IERC734Legacy {
     function removeKey(bytes32 _key, uint256 _purpose) external returns (bool success);
 }
 
-// File: @onchain-id/solidity/contracts/interface/IERC735Legacy.sol
+// File: onchain-id/solidity/contracts/interface/IERC735Legacy.sol
 
 /**
  * @dev interface of the ERC735 (Claim Holder) standard as defined in the EIP.
  */
 interface IERC735Legacy {
-
     /**
      * @dev Emitted when a claim request was performed.
      *
      * Specification: Is not clear
      */
-    event ClaimRequested(uint256 indexed claimRequestId, uint256 indexed topic, uint256 scheme, address indexed issuer, bytes signature, bytes data, string uri);
+    event ClaimRequested(
+        uint256 indexed claimRequestId,
+        uint256 indexed topic,
+        uint256 scheme,
+        address indexed issuer,
+        bytes signature,
+        bytes data,
+        string uri
+    );
 
     /**
      * @dev Emitted when a claim was added.
@@ -158,12 +163,14 @@ interface IERC735Legacy {
      *
      * Claim IDs are generated using `keccak256(abi.encode(address issuer_address, uint256 topic))`.
      */
-    function getClaim(bytes32 _claimId) external view returns(uint256 topic, uint256 scheme, address issuer, bytes memory signature, bytes memory data, string memory uri);
+    function getClaim(
+        bytes32 _claimId
+    ) external view returns (uint256 topic, uint256 scheme, address issuer, bytes memory signature, bytes memory data, string memory uri);
 
     /**
      * @dev Returns an array of claim IDs by topic.
      */
-    function getClaimIdsByTopic(uint256 _topic) external view returns(bytes32[] memory claimIds);
+    function getClaimIdsByTopic(uint256 _topic) external view returns (bytes32[] memory claimIds);
 
     /**
      * @dev Add or update a claim.
@@ -179,7 +186,14 @@ interface IERC735Legacy {
      * This COULD implement an approval process for pending claims, or add them right away.
      * MUST return a claimRequestId (use claim ID) that COULD be sent to the approve function.
      */
-    function addClaim(uint256 _topic, uint256 _scheme, address issuer, bytes calldata _signature, bytes calldata _data, string calldata _uri) external returns (bytes32 claimRequestId);
+    function addClaim(
+        uint256 _topic,
+        uint256 _scheme,
+        address issuer,
+        bytes calldata _signature,
+        bytes calldata _data,
+        string calldata _uri
+    ) external returns (bytes32 claimRequestId);
 
     /**
      * @dev Removes a claim.
@@ -191,23 +205,17 @@ interface IERC735Legacy {
     function removeClaim(bytes32 _claimId) external returns (bool success);
 }
 
-// File: @onchain-id/solidity/contracts/interface/LegacyIIdentity.sol
-
-
+// File: onchain-id/solidity/contracts/interface/LegacyIIdentity.sol
 
 interface LegacyIIdentity is IERC734Legacy, IERC735Legacy {}
 
-// File: @onchain-id/solidity/contracts/interface/IClaimIssuerLegacy.sol
-
-
+// File: onchain-id/solidity/contracts/interface/IClaimIssuerLegacy.sol
 
 interface IClaimIssuerLegacy is LegacyIIdentity {
-    function revokeClaim(bytes32 _claimId, address _identity) external returns(bool);
+    function revokeClaim(bytes32 _claimId, address _identity) external returns (bool);
     function getRecoveredAddress(bytes calldata sig, bytes32 dataHash) external pure returns (address);
     function isClaimRevoked(bytes calldata _sig) external view returns (bool);
-    function isClaimValid(LegacyIIdentity _identity, uint256 claimTopic, bytes calldata sig, bytes calldata data)
-    external
-    view returns (bool);
+    function isClaimValid(LegacyIIdentity _identity, uint256 claimTopic, bytes calldata sig, bytes calldata data) external view returns (bool);
 }
 
 // File: contracts/registry/ITrustedIssuersRegistryLegacy.sol
@@ -234,7 +242,6 @@ interface IClaimIssuerLegacy is LegacyIIdentity {
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 
 interface ITrustedIssuersRegistryLegacy {
     /**
@@ -355,7 +362,6 @@ interface ITrustedIssuersRegistryLegacy {
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 interface IClaimTopicsRegistryLegacy {
     /**
      *  this event is emitted when a claim topic has been added to the ClaimTopicsRegistry
@@ -425,8 +431,6 @@ interface IClaimTopicsRegistryLegacy {
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-
 
 interface IIdentityRegistryStorageLegacy {
     /**
@@ -501,11 +505,7 @@ interface IIdentityRegistryStorageLegacy {
      *  @param _country The country of the investor
      *  emits `IdentityStored` event
      */
-    function addIdentityToStorage(
-        address _userAddress,
-        LegacyIIdentity _identity,
-        uint16 _country
-    ) external;
+    function addIdentityToStorage(address _userAddress, LegacyIIdentity _identity, uint16 _country) external;
 
     /**
      *  @dev Removes an user from the storage.
@@ -586,12 +586,6 @@ interface IIdentityRegistryStorageLegacy {
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-
-
-
-
-
 interface IIdentityRegistryLegacy {
     /**
      *  this event is emitted when the ClaimTopicsRegistry has been set for the IdentityRegistry
@@ -655,11 +649,7 @@ interface IIdentityRegistryLegacy {
      *  @param _country The country of the investor
      *  emits `IdentityRegistered` event
      */
-    function registerIdentity(
-        address _userAddress,
-        LegacyIIdentity _identity,
-        uint16 _country
-    ) external;
+    function registerIdentity(address _userAddress, LegacyIIdentity _identity, uint16 _country) external;
 
     /**
      *  @dev Removes an user from the identity registry.
@@ -726,11 +716,7 @@ interface IIdentityRegistryLegacy {
      *  @param _countries The countries of the corresponding investors
      *  emits _userAddresses.length `IdentityRegistered` events
      */
-    function batchRegisterIdentity(
-        address[] calldata _userAddresses,
-        LegacyIIdentity[] calldata _identities,
-        uint16[] calldata _countries
-    ) external;
+    function batchRegisterIdentity(address[] calldata _userAddresses, LegacyIIdentity[] calldata _identities, uint16[] calldata _countries) external;
 
     /**
      *  @dev This functions checks whether a wallet has its Identity registered or not
@@ -800,7 +786,6 @@ interface IIdentityRegistryLegacy {
 
 // File: contracts/compliance/IComplianceLegacy.sol
 
-
 /**
  *     NOTICE
  *
@@ -823,7 +808,6 @@ interface IIdentityRegistryLegacy {
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 
 interface IComplianceLegacy {
     /**
@@ -903,11 +887,7 @@ interface IComplianceLegacy {
      *  @param _to The address of the receiver
      *  @param _amount The amount of tokens involved in the transfer
      */
-    function canTransfer(
-        address _from,
-        address _to,
-        uint256 _amount
-    ) external view returns (bool);
+    function canTransfer(address _from, address _to, uint256 _amount) external view returns (bool);
 
     /**
      *  @dev function called whenever tokens are transferred
@@ -920,11 +900,7 @@ interface IComplianceLegacy {
      *  @param _to The address of the receiver
      *  @param _amount The amount of tokens involved in the transfer
      */
-    function transferred(
-        address _from,
-        address _to,
-        uint256 _amount
-    ) external;
+    function transferred(address _from, address _to, uint256 _amount) external;
 
     /**
      *  @dev function called whenever tokens are created
@@ -960,7 +936,6 @@ interface IComplianceLegacy {
 }
 
 // File: @openzeppelin/contracts/token/ERC20/IERC20Legacy.sol
-
 
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP.
@@ -1019,11 +994,7 @@ interface IERC20Legacy {
      *
      * Emits a {Transfer} event.
      */
-    function transferFrom(
-        address sender,
-        address recipient,
-        uint256 amount
-    ) external returns (bool);
+    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
 
     /**
      * @dev Emitted when `value` tokens are moved from one account (`from`) to
@@ -1064,8 +1035,6 @@ interface IERC20Legacy {
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-
 
 /// @dev interface
 interface ITokenLegacy is IERC20Legacy {
@@ -1312,11 +1281,7 @@ interface ITokenLegacy is IERC20Legacy {
      *  emits a `TokensUnfrozen` event if `_amount` is higher than the free balance of `_from`
      *  emits a `Transfer` event
      */
-    function forcedTransfer(
-        address _from,
-        address _to,
-        uint256 _amount
-    ) external returns (bool);
+    function forcedTransfer(address _from, address _to, uint256 _amount) external returns (bool);
 
     /**
      *  @dev mint tokens on a wallet
@@ -1356,11 +1321,7 @@ interface ITokenLegacy is IERC20Legacy {
      *  emits a `RecoverySuccess` event if the recovery process is successful
      *  emits a `RecoveryFails` event if the recovery process fails
      */
-    function recoveryAddress(
-        address _lostWallet,
-        address _newWallet,
-        address _investorOnchainID
-    ) external returns (bool);
+    function recoveryAddress(address _lostWallet, address _newWallet, address _investorOnchainID) external returns (bool);
 
     /**
      *  @dev function allowing to issue transfers in batch
@@ -1388,11 +1349,7 @@ interface ITokenLegacy is IERC20Legacy {
      *  emits `TokensUnfrozen` events if `_amounts[i]` is higher than the free balance of `_fromList[i]`
      *  emits _fromList.length `Transfer` events
      */
-    function batchForcedTransfer(
-        address[] calldata _fromList,
-        address[] calldata _toList,
-        uint256[] calldata _amounts
-    ) external;
+    function batchForcedTransfer(address[] calldata _fromList, address[] calldata _toList, uint256[] calldata _amounts) external;
 
     /**
      *  @dev function allowing to mint tokens in batch
@@ -1501,9 +1458,6 @@ interface ITokenLegacy is IERC20Legacy {
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-
-
 contract TokenStorageLegacy {
     /// @dev ERC20 basic variables
     mapping(address => uint256) internal _balances;
@@ -1515,7 +1469,7 @@ contract TokenStorageLegacy {
     string internal tokenSymbol;
     uint8 internal tokenDecimals;
     address internal tokenOnchainID;
-    string internal constant TOKEN_VERSION = '3.5.1';
+    string internal constant TOKEN_VERSION = "3.5.1";
 
     /// @dev Variables of freeze and pause functions
     mapping(address => bool) internal frozen;
@@ -1532,7 +1486,6 @@ contract TokenStorageLegacy {
 
 // File: @openzeppelin/contracts-upgradeable/proxy/utils/InitializableLegacy.sol
 
-
 // solhint-disable-next-line compiler-version
 
 /**
@@ -1548,7 +1501,6 @@ contract TokenStorageLegacy {
  * that all initializers are idempotent. This is not verified automatically as constructors are by Solidity.
  */
 abstract contract InitializableLegacy {
-
     /**
      * @dev Indicates that the contract has been initialized.
      */
@@ -1581,9 +1533,6 @@ abstract contract InitializableLegacy {
 
 // File: @openzeppelin/contracts-upgradeable/utils/ContextUpgradeableLegacy.sol
 
-
-
-
 /*
  * @dev Provides information about the current execution context, including the
  * sender of the transaction and its data. While these are generally available
@@ -1599,8 +1548,7 @@ abstract contract ContextUpgradeableLegacy is InitializableLegacy {
         __Context_init_unchained();
     }
 
-    function __Context_init_unchained() internal initializer {
-    }
+    function __Context_init_unchained() internal initializer {}
     function _msgSender() internal view virtual returns (address) {
         return msg.sender;
     }
@@ -1613,7 +1561,6 @@ abstract contract ContextUpgradeableLegacy is InitializableLegacy {
 }
 
 // File: @openzeppelin/contracts-upgradeable/access/OwnableUpgradeableLegacy.sol
-
 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
@@ -1700,7 +1647,7 @@ library RolesLegacy {
      * @dev Give an account access to this role.
      */
     function add(Role storage role, address account) internal {
-        require(!has(role, account), 'RolesLegacy: account already has role');
+        require(!has(role, account), "RolesLegacy: account already has role");
         role.bearer[account] = true;
     }
 
@@ -1708,7 +1655,7 @@ library RolesLegacy {
      * @dev Remove an account's access to this role.
      */
     function remove(Role storage role, address account) internal {
-        require(has(role, account), 'RolesLegacy: account does not have role');
+        require(has(role, account), "RolesLegacy: account does not have role");
         role.bearer[account] = false;
     }
 
@@ -1717,7 +1664,7 @@ library RolesLegacy {
      * @return bool
      */
     function has(Role storage role, address account) internal view returns (bool) {
-        require(account != address(0), 'RolesLegacy: account is the zero address');
+        require(account != address(0), "RolesLegacy: account is the zero address");
         return role.bearer[account];
     }
 }
@@ -1747,7 +1694,6 @@ library RolesLegacy {
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 contract AgentRoleUpgradeableLegacy is OwnableUpgradeableLegacy {
     using RolesLegacy for RolesLegacy.Role;
 
@@ -1757,7 +1703,7 @@ contract AgentRoleUpgradeableLegacy is OwnableUpgradeableLegacy {
     RolesLegacy.Role private _agents;
 
     modifier onlyAgent() {
-        require(isAgent(msg.sender), 'AgentRole: caller does not have the Agent role');
+        require(isAgent(msg.sender), "AgentRole: caller does not have the Agent role");
         _;
     }
 
@@ -1801,9 +1747,7 @@ contract AgentRoleUpgradeableLegacy is OwnableUpgradeableLegacy {
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 contract LegacyToken_3_5_2 is ITokenLegacy, AgentRoleUpgradeableLegacy, TokenStorageLegacy {
-
     /**
      *  @dev the constructor initiates the token contract
      *  msg.sender is set automatically as the owner of the smart contract
@@ -1817,15 +1761,8 @@ contract LegacyToken_3_5_2 is ITokenLegacy, AgentRoleUpgradeableLegacy, TokenSto
      *  emits an `IdentityRegistryAdded` event
      *  emits a `ComplianceAdded` event
      */
-    function init(
-        address _identityRegistry,
-        address _compliance,
-        string memory _name,
-        string memory _symbol,
-        uint8 _decimals,
-        address _onchainID
-    ) public {
-        require(owner() == address(0), 'already initialized');
+    function init(address _identityRegistry, address _compliance, string memory _name, string memory _symbol, uint8 _decimals, address _onchainID) public {
+        require(owner() == address(0), "already initialized");
         tokenName = _name;
         tokenSymbol = _symbol;
         tokenDecimals = _decimals;
@@ -1840,13 +1777,13 @@ contract LegacyToken_3_5_2 is ITokenLegacy, AgentRoleUpgradeableLegacy, TokenSto
 
     /// @dev Modifier to make a function callable only when the contract is not paused.
     modifier whenNotPaused() {
-        require(!tokenPaused, 'Pausable: paused');
+        require(!tokenPaused, "Pausable: paused");
         _;
     }
 
     /// @dev Modifier to make a function callable only when the contract is paused.
     modifier whenPaused() {
-        require(tokenPaused, 'Pausable: not paused');
+        require(tokenPaused, "Pausable: not paused");
         _;
     }
 
@@ -1898,13 +1835,9 @@ contract LegacyToken_3_5_2 is ITokenLegacy, AgentRoleUpgradeableLegacy, TokenSto
     /**
      *  @dev See {ERC20-_mint}.
      */
-    function _transfer(
-        address _from,
-        address _to,
-        uint256 _amount
-    ) internal virtual {
-        require(_from != address(0), 'ERC20: transfer from the zero address');
-        require(_to != address(0), 'ERC20: transfer to the zero address');
+    function _transfer(address _from, address _to, uint256 _amount) internal virtual {
+        require(_from != address(0), "ERC20: transfer from the zero address");
+        require(_to != address(0), "ERC20: transfer to the zero address");
 
         _beforeTokenTransfer(_from, _to, _amount);
 
@@ -1917,7 +1850,7 @@ contract LegacyToken_3_5_2 is ITokenLegacy, AgentRoleUpgradeableLegacy, TokenSto
      *  @dev See {ERC20-_mint}.
      */
     function _mint(address _userAddress, uint256 _amount) internal virtual {
-        require(_userAddress != address(0), 'ERC20: mint to the zero address');
+        require(_userAddress != address(0), "ERC20: mint to the zero address");
 
         _beforeTokenTransfer(address(0), _userAddress, _amount);
 
@@ -1930,7 +1863,7 @@ contract LegacyToken_3_5_2 is ITokenLegacy, AgentRoleUpgradeableLegacy, TokenSto
      *  @dev See {ERC20-_burn}.
      */
     function _burn(address _userAddress, uint256 _amount) internal virtual {
-        require(_userAddress != address(0), 'ERC20: burn from the zero address');
+        require(_userAddress != address(0), "ERC20: burn from the zero address");
 
         _beforeTokenTransfer(_userAddress, address(0), _amount);
 
@@ -1942,13 +1875,9 @@ contract LegacyToken_3_5_2 is ITokenLegacy, AgentRoleUpgradeableLegacy, TokenSto
     /**
      *  @dev See {ERC20-_approve}.
      */
-    function _approve(
-        address _owner,
-        address _spender,
-        uint256 _amount
-    ) internal virtual {
-        require(_owner != address(0), 'ERC20: approve from the zero address');
-        require(_spender != address(0), 'ERC20: approve to the zero address');
+    function _approve(address _owner, address _spender, uint256 _amount) internal virtual {
+        require(_owner != address(0), "ERC20: approve from the zero address");
+        require(_spender != address(0), "ERC20: approve to the zero address");
 
         _allowances[_owner][_spender] = _amount;
         emit Approval(_owner, _spender, _amount);
@@ -1957,11 +1886,7 @@ contract LegacyToken_3_5_2 is ITokenLegacy, AgentRoleUpgradeableLegacy, TokenSto
     /**
      *  @dev See {ERC20-_beforeTokenTransfer}.
      */
-    function _beforeTokenTransfer(
-        address _from,
-        address _to,
-        uint256 _amount
-    ) internal virtual {}
+    function _beforeTokenTransfer(address _from, address _to, uint256 _amount) internal virtual {}
 
     /**
      *  @dev See {ITokenLegacy-decimals}.
@@ -2053,14 +1978,14 @@ contract LegacyToken_3_5_2 is ITokenLegacy, AgentRoleUpgradeableLegacy, TokenSto
      *  @return `true` if successful and revert if unsuccessful
      */
     function transfer(address _to, uint256 _amount) public override whenNotPaused returns (bool) {
-        require(!frozen[_to] && !frozen[msg.sender], 'wallet is frozen');
-        require(_amount <= balanceOf(msg.sender) - (frozenTokens[msg.sender]), 'Insufficient Balance');
+        require(!frozen[_to] && !frozen[msg.sender], "wallet is frozen");
+        require(_amount <= balanceOf(msg.sender) - (frozenTokens[msg.sender]), "Insufficient Balance");
         if (tokenIdentityRegistry.isVerified(_to) && tokenCompliance.canTransfer(msg.sender, _to, _amount)) {
             tokenCompliance.transferred(msg.sender, _to, _amount);
             _transfer(msg.sender, _to, _amount);
             return true;
         }
-        revert('Transfer not possible');
+        revert("Transfer not possible");
     }
 
     /**
@@ -2112,13 +2037,9 @@ contract LegacyToken_3_5_2 is ITokenLegacy, AgentRoleUpgradeableLegacy, TokenSto
      *  @param _amount The number of tokens to transfer
      *  @return `true` if successful and revert if unsuccessful
      */
-    function transferFrom(
-        address _from,
-        address _to,
-        uint256 _amount
-    ) external override whenNotPaused returns (bool) {
-        require(!frozen[_to] && !frozen[_from], 'wallet is frozen');
-        require(_amount <= balanceOf(_from) - (frozenTokens[_from]), 'Insufficient Balance');
+    function transferFrom(address _from, address _to, uint256 _amount) external override whenNotPaused returns (bool) {
+        require(!frozen[_to] && !frozen[_from], "wallet is frozen");
+        require(_amount <= balanceOf(_from) - (frozenTokens[_from]), "Insufficient Balance");
         if (tokenIdentityRegistry.isVerified(_to) && tokenCompliance.canTransfer(_from, _to, _amount)) {
             tokenCompliance.transferred(_from, _to, _amount);
             _transfer(_from, _to, _amount);
@@ -2126,17 +2047,13 @@ contract LegacyToken_3_5_2 is ITokenLegacy, AgentRoleUpgradeableLegacy, TokenSto
             return true;
         }
 
-        revert('Transfer not possible');
+        revert("Transfer not possible");
     }
 
     /**
      *  @dev See {ITokenLegacy-forcedTransfer}.
      */
-    function forcedTransfer(
-        address _from,
-        address _to,
-        uint256 _amount
-    ) public override onlyAgent returns (bool) {
+    function forcedTransfer(address _from, address _to, uint256 _amount) public override onlyAgent returns (bool) {
         uint256 freeBalance = balanceOf(_from) - (frozenTokens[_from]);
         if (_amount > freeBalance) {
             uint256 tokensToUnfreeze = _amount - (freeBalance);
@@ -2148,17 +2065,13 @@ contract LegacyToken_3_5_2 is ITokenLegacy, AgentRoleUpgradeableLegacy, TokenSto
             _transfer(_from, _to, _amount);
             return true;
         }
-        revert('Transfer not possible');
+        revert("Transfer not possible");
     }
 
     /**
      *  @dev See {ITokenLegacy-batchForcedTransfer}.
      */
-    function batchForcedTransfer(
-        address[] calldata _fromList,
-        address[] calldata _toList,
-        uint256[] calldata _amounts
-    ) external override {
+    function batchForcedTransfer(address[] calldata _fromList, address[] calldata _toList, uint256[] calldata _amounts) external override {
         for (uint256 i = 0; i < _fromList.length; i++) {
             forcedTransfer(_fromList[i], _toList[i], _amounts[i]);
         }
@@ -2168,8 +2081,8 @@ contract LegacyToken_3_5_2 is ITokenLegacy, AgentRoleUpgradeableLegacy, TokenSto
      *  @dev See {ITokenLegacy-mint}.
      */
     function mint(address _to, uint256 _amount) public override onlyAgent {
-        require(tokenIdentityRegistry.isVerified(_to), 'Identity is not verified.');
-        require(tokenCompliance.canTransfer(msg.sender, _to, _amount), 'Compliance not followed');
+        require(tokenIdentityRegistry.isVerified(_to), "Identity is not verified.");
+        require(tokenCompliance.canTransfer(msg.sender, _to, _amount), "Compliance not followed");
         _mint(_to, _amount);
         tokenCompliance.created(_to, _amount);
     }
@@ -2229,7 +2142,7 @@ contract LegacyToken_3_5_2 is ITokenLegacy, AgentRoleUpgradeableLegacy, TokenSto
      */
     function freezePartialTokens(address _userAddress, uint256 _amount) public override onlyAgent {
         uint256 balance = balanceOf(_userAddress);
-        require(balance >= frozenTokens[_userAddress] + _amount, 'Amount exceeds available balance');
+        require(balance >= frozenTokens[_userAddress] + _amount, "Amount exceeds available balance");
         frozenTokens[_userAddress] = frozenTokens[_userAddress] + (_amount);
         emit TokensFrozen(_userAddress, _amount);
     }
@@ -2247,7 +2160,7 @@ contract LegacyToken_3_5_2 is ITokenLegacy, AgentRoleUpgradeableLegacy, TokenSto
      *  @dev See {ITokenLegacy-unfreezePartialTokens}.
      */
     function unfreezePartialTokens(address _userAddress, uint256 _amount) public override onlyAgent {
-        require(frozenTokens[_userAddress] >= _amount, 'Amount should be less than or equal to frozen tokens');
+        require(frozenTokens[_userAddress] >= _amount, "Amount should be less than or equal to frozen tokens");
         frozenTokens[_userAddress] = frozenTokens[_userAddress] - (_amount);
         emit TokensUnfrozen(_userAddress, _amount);
     }
@@ -2280,12 +2193,8 @@ contract LegacyToken_3_5_2 is ITokenLegacy, AgentRoleUpgradeableLegacy, TokenSto
     /**
      *  @dev See {ITokenLegacy-recoveryAddress}.
      */
-    function recoveryAddress(
-        address _lostWallet,
-        address _newWallet,
-        address _investorOnchainID
-    ) external override onlyAgent returns (bool) {
-        require(balanceOf(_lostWallet) != 0, 'no tokens to recover');
+    function recoveryAddress(address _lostWallet, address _newWallet, address _investorOnchainID) external override onlyAgent returns (bool) {
+        require(balanceOf(_lostWallet) != 0, "no tokens to recover");
         LegacyIIdentity _onchainID = LegacyIIdentity(_investorOnchainID);
         bytes32 _key = keccak256(abi.encode(_newWallet));
         if (_onchainID.keyHasPurpose(_key, 1)) {
@@ -2303,7 +2212,7 @@ contract LegacyToken_3_5_2 is ITokenLegacy, AgentRoleUpgradeableLegacy, TokenSto
             emit RecoverySuccess(_lostWallet, _newWallet, _investorOnchainID);
             return true;
         }
-        revert('Recovery not possible');
+        revert("Recovery not possible");
     }
 
     /**

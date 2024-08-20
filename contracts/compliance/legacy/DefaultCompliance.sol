@@ -60,31 +60,28 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 import "./BasicCompliance.sol";
 
 contract DefaultCompliance is BasicCompliance {
     /**
-    *  @dev See {ICompliance-transferred}.
-    */
+     *  @dev See {ICompliance-transferred}.
+     */
     // solhint-disable-next-line no-empty-blocks
-    function transferred(address _from, address _to, uint256 _value) external override {
-    }
+    function transferred(address _from, address _to, uint256 _value) external override {}
 
     /**
      *  @dev See {ICompliance-created}.
      */
     // solhint-disable-next-line no-empty-blocks
-    function created(address _to, uint256 _value) external override {
-    }
+    function created(address _to, uint256 _value) external override {}
 
     /**
      *  @dev See {ICompliance-destroyed}.
      */
     // solhint-disable-next-line no-empty-blocks
-    function destroyed(address _from, uint256 _value) external override {
-    }
+    function destroyed(address _from, uint256 _value) external override {}
 
     /**
      *  @dev See {ICompliance-canTransfer}.

@@ -60,32 +60,24 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
-import "@onchain-id/solidity/contracts/interface/IIdentity.sol";
+import "contracts/utils/onchain-id/solidity/contracts/interface/IIdentity.sol";
 
 import "../../roles/AgentRoleUpgradeable.sol";
 import "../interface/IIdentityRegistryStorage.sol";
 import "../storage/IRSStorage.sol";
 
 contract IdentityRegistryStorage is IIdentityRegistryStorage, AgentRoleUpgradeable, IRSStorage {
-
     function init() external initializer {
-        __Ownable_init();
+        __Ownable_init(msg.sender);
     }
 
     /**
      *  @dev See {IIdentityRegistryStorage-addIdentityToStorage}.
      */
-    function addIdentityToStorage(
-        address _userAddress,
-        IIdentity _identity,
-        uint16 _country
-    ) external override onlyAgent {
-        require(
-            _userAddress != address(0)
-            && address(_identity) != address(0)
-        , "invalid argument - zero address");
+    function addIdentityToStorage(address _userAddress, IIdentity _identity, uint16 _country) external override onlyAgent {
+        require(_userAddress != address(0) && address(_identity) != address(0), "invalid argument - zero address");
         require(address(_identities[_userAddress].identityContract) == address(0), "address stored already");
         _identities[_userAddress].identityContract = _identity;
         _identities[_userAddress].investorCountry = _country;
@@ -96,10 +88,7 @@ contract IdentityRegistryStorage is IIdentityRegistryStorage, AgentRoleUpgradeab
      *  @dev See {IIdentityRegistryStorage-modifyStoredIdentity}.
      */
     function modifyStoredIdentity(address _userAddress, IIdentity _identity) external override onlyAgent {
-        require(
-            _userAddress != address(0)
-            && address(_identity) != address(0)
-        , "invalid argument - zero address");
+        require(_userAddress != address(0) && address(_identity) != address(0), "invalid argument - zero address");
         require(address(_identities[_userAddress].identityContract) != address(0), "address not stored yet");
         IIdentity oldIdentity = _identities[_userAddress].identityContract;
         _identities[_userAddress].identityContract = _identity;

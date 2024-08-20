@@ -60,7 +60,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "../../token/IToken.sol";
@@ -68,9 +68,7 @@ import "./IModularCompliance.sol";
 import "./MCStorage.sol";
 import "./modules/IModule.sol";
 
-
 contract ModularCompliance is IModularCompliance, OwnableUpgradeable, MCStorage {
-
     /// modifiers
 
     /**
@@ -82,25 +80,24 @@ contract ModularCompliance is IModularCompliance, OwnableUpgradeable, MCStorage 
     }
 
     function init() external initializer {
-        __Ownable_init();
+        __Ownable_init(msg.sender);
     }
 
     /**
      *  @dev See {IModularCompliance-bindToken}.
      */
     function bindToken(address _token) external override {
-        require(owner() == msg.sender || (_tokenBound == address(0) && msg.sender == _token),
-        "only owner or token can call");
+        require(owner() == msg.sender || (_tokenBound == address(0) && msg.sender == _token), "only owner or token can call");
         require(_token != address(0), "invalid argument - zero address");
         _tokenBound = _token;
         emit TokenBound(_token);
     }
 
     /**
-    *  @dev See {IModularCompliance-unbindToken}.
-    */
+     *  @dev See {IModularCompliance-unbindToken}.
+     */
     function unbindToken(address _token) external override {
-        require(owner() == msg.sender || msg.sender == _token , "only owner or token can call");
+        require(owner() == msg.sender || msg.sender == _token, "only owner or token can call");
         require(_token == _tokenBound, "This token is not bound");
         require(_token != address(0), "invalid argument - zero address");
         delete _tokenBound;
@@ -145,13 +142,10 @@ contract ModularCompliance is IModularCompliance, OwnableUpgradeable, MCStorage 
     }
 
     /**
-    *  @dev See {IModularCompliance-transferred}.
-    */
-    function transferred(address _from, address _to, uint256 _value) external onlyToken override {
-        require(
-            _from != address(0)
-            && _to != address(0)
-        , "invalid argument - zero address");
+     *  @dev See {IModularCompliance-transferred}.
+     */
+    function transferred(address _from, address _to, uint256 _value) external override onlyToken {
+        require(_from != address(0) && _to != address(0), "invalid argument - zero address");
         require(_value > 0, "invalid argument - no value transfer");
         uint256 length = _modules.length;
         for (uint256 i = 0; i < length; i++) {
@@ -162,7 +156,7 @@ contract ModularCompliance is IModularCompliance, OwnableUpgradeable, MCStorage 
     /**
      *  @dev See {IModularCompliance-created}.
      */
-    function created(address _to, uint256 _value) external onlyToken override {
+    function created(address _to, uint256 _value) external override onlyToken {
         require(_to != address(0), "invalid argument - zero address");
         require(_value > 0, "invalid argument - no value mint");
         uint256 length = _modules.length;
@@ -174,7 +168,7 @@ contract ModularCompliance is IModularCompliance, OwnableUpgradeable, MCStorage 
     /**
      *  @dev See {IModularCompliance-destroyed}.
      */
-    function destroyed(address _from, uint256 _value) external onlyToken override {
+    function destroyed(address _from, uint256 _value) external override onlyToken {
         require(_from != address(0), "invalid argument - zero address");
         require(_value > 0, "invalid argument - no value burn");
         uint256 length = _modules.length;
@@ -198,24 +192,13 @@ contract ModularCompliance is IModularCompliance, OwnableUpgradeable, MCStorage 
         assembly {
             let freeMemoryPointer := mload(0x40)
             calldatacopy(freeMemoryPointer, callData.offset, callData.length)
-            if iszero(
-            call(
-            gas(),
-            _module,
-            0,
-            freeMemoryPointer,
-            callData.length,
-            0,
-            0
-            ))
-            {
+            if iszero(call(gas(), _module, 0, freeMemoryPointer, callData.length, 0, 0)) {
                 returndatacopy(0, 0, returndatasize())
                 revert(0, returndatasize())
             }
         }
 
         emit ModuleInteraction(_module, _selector(callData));
-
     }
 
     /**
@@ -271,4 +254,3 @@ contract ModularCompliance is IModularCompliance, OwnableUpgradeable, MCStorage 
         }
     }
 }
-

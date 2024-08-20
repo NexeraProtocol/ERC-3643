@@ -121,23 +121,17 @@ contract SupplyLimitModule is AbstractModuleUpgradeable {
     /**
      *  @dev See {IModule-moduleCheck}.
      */
-    function moduleCheck(
-        address _from,
-        address /*_to*/,
-        uint256 _value,
-        address _compliance
-    ) external view override returns (bool) {
-        if (_from == address(0) &&
-            (IToken(IModularCompliance(_compliance).getTokenBound()).totalSupply() + _value) > _supplyLimits[_compliance]) {
+    function moduleCheck(address _from, address /*_to*/, uint256 _value, address _compliance) external view override returns (bool) {
+        if (_from == address(0) && (IToken(IModularCompliance(_compliance).getTokenBound()).totalSupply() + _value) > _supplyLimits[_compliance]) {
             return false;
         }
         return true;
     }
 
     /**
-    *  @dev getter for `supplyLimits` variable
-    *  returns supply limit
-    */
+     *  @dev getter for `supplyLimits` variable
+     *  returns supply limit
+     */
     function getSupplyLimit(address _compliance) external view returns (uint256) {
         return _supplyLimits[_compliance];
     }

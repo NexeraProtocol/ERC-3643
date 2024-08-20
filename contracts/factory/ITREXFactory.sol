@@ -59,10 +59,9 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 interface ITREXFactory {
-
     /// Types
 
     struct TokenDetails {
@@ -113,8 +112,7 @@ interface ITREXFactory {
     event ImplementationAuthoritySet(address _implementationAuthority);
 
     /// event emitted by the factory when a full suite of T-REX contracts is deployed
-    event TREXSuiteDeployed(address indexed _token, address _ir, address _irs, address _tir, address _ctr, address
-    _mc, string indexed _salt);
+    event TREXSuiteDeployed(address indexed _token, address _ir, address _irs, address _tir, address _ctr, address _mc, string indexed _salt);
 
     /// functions
 
@@ -161,10 +159,7 @@ interface ITREXFactory {
      *  cannot add more than 5 claim topics required and more than 5 trusted issuers
      *  cannot add more than 30 compliance settings transactions
      */
-    function deployTREXSuite(
-        string memory _salt,
-        TokenDetails calldata _tokenDetails,
-        ClaimDetails calldata _claimDetails) external;
+    function deployTREXSuite(string memory _salt, TokenDetails calldata _tokenDetails, ClaimDetails calldata _claimDetails) external;
 
     /**
      *  @dev function that can be used to recover the ownership of contracts owned by the factory
@@ -178,16 +173,16 @@ interface ITREXFactory {
     /**
      *  @dev getter for implementation authority address
      */
-    function getImplementationAuthority() external view returns(address);
+    function getImplementationAuthority() external view returns (address);
 
     /**
      *  @dev getter for identity factory address
      */
-    function getIdFactory() external view returns(address);
+    function getIdFactory() external view returns (address);
 
     /**
      *  @dev getter for token address corresponding to salt string
      *  @param _salt The salt string that was used to deploy the token
      */
-    function getToken(string calldata _salt) external view returns(address);
+    function getToken(string calldata _salt) external view returns (address);
 }

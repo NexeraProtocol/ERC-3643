@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 interface IImplementationAuthorityLegacy {
     function getImplementation() external view returns (address);
@@ -23,26 +23,17 @@ contract LegacyProxy {
         address logic = IImplementationAuthorityLegacy(implementationAuthority).getImplementation();
 
         // solhint-disable-next-line avoid-low-level-calls
-        (bool success, ) =
-        logic.delegatecall(
-            abi.encodeWithSignature(
-                'init(address,address,string,string,uint8,address)',
-                _identityRegistry,
-                _compliance,
-                _name,
-                _symbol,
-                _decimals,
-                _onchainID
-            )
+        (bool success, ) = logic.delegatecall(
+            abi.encodeWithSignature("init(address,address,string,string,uint8,address)", _identityRegistry, _compliance, _name, _symbol, _decimals, _onchainID)
         );
-        require(success, 'Initialization failed.');
+        require(success, "Initialization failed.");
     }
 
     fallback() external payable {
         address logic = IImplementationAuthorityLegacy(implementationAuthority).getImplementation();
 
         assembly {
-        // solium-disable-line
+            // solium-disable-line
             calldatacopy(0x0, 0x0, calldatasize())
             let success := delegatecall(sub(gas(), 10000), logic, 0x0, calldatasize(), 0, 0)
             let retSz := returndatasize()
