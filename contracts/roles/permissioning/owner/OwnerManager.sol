@@ -70,8 +70,8 @@ import "../../../registry/interface/IClaimTopicsRegistry.sol";
 import "../../../compliance/legacy/ICompliance.sol";
 import "./OwnerRoles.sol";
 import "../../AgentRole.sol";
-import "contracts/utils/onchain-id/solidity/contracts/interface/IIdentity.sol";
-import "contracts/utils/onchain-id/solidity/contracts/interface/IClaimIssuer.sol";
+import "lib/onchain-id/solidity/contracts/interface/IIdentity.sol";
+import "lib/onchain-id/solidity/contracts/interface/IClaimIssuer.sol";
 
 contract OwnerManager is OwnerRoles {
     /// @dev the token that is managed by this OwnerManager Contract

@@ -64,7 +64,7 @@
 pragma solidity ^0.8.17;
 
 import "./IToken.sol";
-import "contracts/utils/onchain-id/solidity/contracts/interface/IIdentity.sol";
+import "lib/onchain-id/solidity/contracts/interface/IIdentity.sol";
 import "./TokenStorage.sol";
 import "../roles/AgentRoleUpgradeable.sol";
 

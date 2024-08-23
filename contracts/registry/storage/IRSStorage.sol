@@ -63,7 +63,7 @@
 
 pragma solidity ^0.8.17;
 
-import "contracts/utils/onchain-id/solidity/contracts/interface/IIdentity.sol";
+import "lib/onchain-id/solidity/contracts/interface/IIdentity.sol";
 
 contract IRSStorage {
     /// @dev struct containing the identity contract and the country of the user

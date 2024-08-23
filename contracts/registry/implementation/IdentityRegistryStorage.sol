@@ -62,7 +62,7 @@
 
 pragma solidity ^0.8.17;
 
-import "contracts/utils/onchain-id/solidity/contracts/interface/IIdentity.sol";
+import "lib/onchain-id/solidity/contracts/interface/IIdentity.sol";
 
 import "../../roles/AgentRoleUpgradeable.sol";
 import "../interface/IIdentityRegistryStorage.sol";

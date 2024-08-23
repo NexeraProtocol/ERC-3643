@@ -76,7 +76,7 @@ import "../proxy/IdentityRegistryStorageProxy.sol";
 import "../proxy/TrustedIssuersRegistryProxy.sol";
 import "../proxy/ModularComplianceProxy.sol";
 import "./ITREXFactory.sol";
-import "contracts/utils/onchain-id/solidity/contracts/factory/IIdFactory.sol";
+import "lib/onchain-id/solidity/contracts/factory/IIdFactory.sol";
 
 contract TREXFactory is ITREXFactory, Ownable {
     /// the address of the implementation authority contract used in the tokens deployed by the factory
